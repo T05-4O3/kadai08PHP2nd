@@ -14,7 +14,15 @@ $id = $_GET['id'];
 
 //2. DB接続します
 //*** function化する！  *****************
-$pdo = db_conn();
+try {
+    $db_name = 'cgp2_movie_db'; //データベース名
+    $db_id   = 'root'; //アカウント名
+    $db_pw   = ''; //パスワード：MAMPは'root'
+    $db_host = 'localhost'; //DBホスト
+    $pdo = new PDO('mysql:dbname=' . $db_name . ';charset=utf8mb4;host=' . $db_host, $db_id, $db_pw);
+} catch (PDOException $e) {
+    exit('DBConnectError' . $e->getMessage());
+}
 
 //３．データ登録SQL作成
 // [UPDATE テーブル名 SET カラム1 = 1に入れたいもの, カラム2 = ２に保存したいもの,,,, WHERE 条件]
@@ -35,7 +43,7 @@ if ($status === false) {
     $error = $stmt->errorInfo();
     exit('SQLError:' . print_r($error, true));
 } else {
-    header('Location: selectTest2.php');
+    header('Location: ./selectTest2.php');
     exit;
 }
 

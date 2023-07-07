@@ -72,7 +72,7 @@ function getYouTubeVideoId($url) {
 
 // YouTubeの埋め込みコードを取得する関数
 function getYouTubeEmbedCodeWithAPI($videoId) {
-    $apiKey = 'KEY'; // APIキーを指定してください
+    $apiKey = ''; // APIキーを指定してください
     $apiUrl = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' . $videoId . '&key=' . $apiKey;
 
     $ch = curl_init();
@@ -117,6 +117,22 @@ $onlineMovieUrl = isset($result['onlineMovieUrl']) ? $result['onlineMovieUrl'] :
 $embedCode = getEmbedCode($onlineMovieUrl);
 $title = isset($result['title']) ? $result['title'] : '';
 
+// 削除処理
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $deleteId = isset($_POST['id']) ? $_POST['id'] : '';
+
+    $stmt = $pdo->prepare('DELETE FROM cgp2_movie_table WHERE id = :id');
+    $stmt->bindValue(':id', $deleteId, PDO::PARAM_INT);
+    $status = $stmt->execute();
+
+    if ($status === false) {
+        $error = $stmt->errorInfo();
+        exit('SQLError:' . print_r($error, true));
+    } else {
+        header('Location: ./selectTest2.php');
+        exit;
+    }
+}
 
 ?>
 
@@ -164,8 +180,10 @@ $title = isset($result['title']) ? $result['title'] : '';
 
             <input type="hidden" name="id" value="<?= $result['id'] ?>">
             <input type="submit" value="更新">
-            <input type="submit" value="削除" formaction="dbdeleteTest2.php">
-
+        </form>
+        <form id="deleteForm" method="GET" action="./dbdeleteTest2.php">
+            <input type="hidden" name="id" value="<?= $result['id'] ?>">
+            <input type="submit" value="削除">
         </form>
     </div>
     <!-- Main[End] -->
